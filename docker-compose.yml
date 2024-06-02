@@ -28,7 +28,7 @@ services:
     ports:
       - "9500:9500"
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx.conf:/etc/nginx/nginx.conf
     depends_on:
       - emqx
       - nodered
