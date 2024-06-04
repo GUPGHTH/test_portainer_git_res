@@ -5,20 +5,48 @@ services:
     image: emqx/emqx:latest
     container_name: emqx
     hostname: emqx
+    restart: always
     ports:
-      - "1883:1883"
-      - "8083:8083"
-      - "8084:8084"
-      - "18083:18083"
+      - "9500:1883"
     networks:
       - mynet
+    volumes:
+      - ./emqx/vol-emqx-data:/opt/emqx/data
+      - ./emqx/vol-emqx-log:/opt/emqx/log
 
   nodered:
     image: nodered/node-red:latest
     hostname: nodered
     container_name: nodered
+    volumes:
+      - ./nodered_data:/data
+    networks:
+      - mynet
+
+  db:
+    image: mysql:5.7
+    container_name: dbsql
+    hostname: mysql_ht
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+    volumes:
+      - ./data/sql:/var/lib/mysql
+    networks:
+      - mynet
+
+  phpmyadmin:
+    depends_on:
+      - db
+    container_name: phpmyadmin
+    image: phpmyadmin/phpmyadmin
+    hostname: phpmyadmin
     ports:
-      - "1880:1880"
+      - "8090:80"
+    restart : always
+    environment:
+      PMA_HOST : db
+      MYSQL_ROOT_PASSWORD : example
     networks:
       - mynet
 
@@ -32,6 +60,7 @@ services:
     depends_on:
       - emqx
       - nodered
+      - phpmyadmin
     networks:
       - mynet
 
